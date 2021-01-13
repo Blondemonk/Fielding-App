@@ -132,7 +132,7 @@ export default function Home() {
       window.requestAnimationFrame(redraw);
       window.setTimeout(() => {
         window.requestAnimationFrame(redraw);
-      }, 150);
+      }, 500);
     }).catch((err) => console.error(err));
 
     canvas.current.addEventListener('mousedown', (e) => {
