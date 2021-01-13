@@ -65,21 +65,23 @@ export default function Home() {
   let clicked = useRef(false);
   let fielder = useRef(-1);
 
-  // let [preset, setPreset] = useState('Default');
   let [preset, setPreset] = useState(Object.keys(fieldingPositions)[0]);
 
   let pitchImg = useRef();
   let fielderImg = useRef();
   let batterImg = useRef();
 
-  let redrawing = useRef(false);
-
   const drawPitch = () => {
     ctx.current.drawImage(pitchImg.current, 0, 0, 1080, 1080);
   };
 
   const drawFielders = () => {
-    let size = scale.current * 40.0;
+    let size;
+    if (container.current.offsetWidth > 700) {
+      size = Math.max(scale.current * 30.0, 30);
+    } else {
+      size = Math.max(scale.current * 40.0, 30);
+    }
 
     Object.values(fieldingPositions[preset]).forEach((f, i) => {
       ctx.current.drawImage(fielderImg.current, 0, 0, 40, 40, f.x - size/2, f.y - size/2, size, size);
@@ -87,7 +89,12 @@ export default function Home() {
   };
 
   const drawBatters = () => {
-    let size = scale.current * 40.0;
+    let size;
+    if (container.current.offsetWidth > 700) {
+      size = Math.max(scale.current * 30.0, 30);
+    } else {
+      size = Math.max(scale.current * 40.0, 30);
+    }
 
     Object.values(battingPositions).forEach((f, i) => {
       ctx.current.drawImage(batterImg.current, 0, 0, 40, 40, f.x - size/2, f.y - size/2, size, size);
@@ -95,7 +102,6 @@ export default function Home() {
   }
 
   const redraw = () => {
-    redrawing.current = true;
     (() => {
       return new Promise((res, rej) => {
         drawPitch();
@@ -104,7 +110,6 @@ export default function Home() {
     })().then(() => {
       drawFielders();
       drawBatters();
-      redrawing.current = false;
     });
   }
 
@@ -125,6 +130,9 @@ export default function Home() {
       batterImg.current = values[2];
 
       window.requestAnimationFrame(redraw);
+      window.setTimeout(() => {
+        window.requestAnimationFrame(redraw);
+      }, 100);
     }).catch((err) => console.error(err));
 
     canvas.current.addEventListener('mousedown', (e) => {
@@ -139,13 +147,19 @@ export default function Home() {
     });
 
     canvas.current.addEventListener('mousemove', (e) => {
-      if (clicked.current && fielder.current != undefined && fielder.current !== -1) {
-        let x = e.layerX / scale.current;
-        let y = e.layerY / scale.current;
+      let x = e.layerX / scale.current;
+      let y = e.layerY / scale.current;
 
+      if (clicked.current && fielder.current != undefined && fielder.current !== -1) {
         fieldingPositions[preset][fielder.current] = {x: x, y: y};
 
         window.requestAnimationFrame(redraw);
+      } else {
+        if (findFielder(x, y) >= 0) {
+          canvas.current.style.cursor = "pointer";
+        } else {
+          canvas.current.style.cursor = "default";
+        }
       }
     });
   }, [preset]);
