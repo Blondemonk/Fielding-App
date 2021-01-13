@@ -1,0 +1,13 @@
+$imageSize: min(100vh, 100vw, 1080px)
+
+.canvasContainer
+  height: min(100%, 100vh)
+  width: min(100%, 100vw)
+  overflow: auto
+  align-items: center
+  display: flex
+  justify-content: center
+
+.canvas
+  height: calc(#{$imageSize} - 50px)
+  width: calc(#{$imageSize} - 50px)

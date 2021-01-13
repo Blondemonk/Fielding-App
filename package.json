@@ -1,0 +1,31 @@
+{
+  "name": "fielding-app",
+  "version": "0.2.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --hostname 0.0.0.0",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "@material-ui/core": "^4.11.0",
+    "@material-ui/icons": "^4.11.2",
+    "axios": "^0.21.0",
+    "imagemin-optipng": "^8.0.0",
+    "next": "^10.0.1",
+    "querystring": "^0.2.0",
+    "react": "16.13.1",
+    "react-dom": "16.13.1",
+    "sass": "^1.29.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Blondemonk/fielding-app.git"
+  },
+  "devDependencies": {
+    "next-optimized-images": "^2.6.2",
+    "responsive-loader": "^2.2.1",
+    "sharp": "^0.26.3",
+    "webp-loader": "^0.6.0"
+  }
+}
