@@ -132,7 +132,7 @@ export default function Home() {
       window.requestAnimationFrame(redraw);
       window.setTimeout(() => {
         window.requestAnimationFrame(redraw);
-      }, 100);
+      }, 150);
     }).catch((err) => console.error(err));
 
     canvas.current.addEventListener('mousedown', (e) => {
@@ -141,14 +141,41 @@ export default function Home() {
       let y = e.layerY / scale.current;
       fielder.current = findFielder(x, y);
     });
+    canvas.current.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      clicked.current = true;
+      let x = (e.targetTouches[0].pageX - canvas.current.offsetLeft) / scale.current;
+      let y = (e.targetTouches[0].pageY - canvas.current.offsetTop) / scale.current;
+      fielder.current = findFielder(x, y);
+    });
 
     canvas.current.addEventListener('mouseup', (e) => {
+      clicked.current = false;
+    });
+    canvas.current.addEventListener('touchend', (e) => {
       clicked.current = false;
     });
 
     canvas.current.addEventListener('mousemove', (e) => {
       let x = e.layerX / scale.current;
       let y = e.layerY / scale.current;
+
+      if (clicked.current && fielder.current != undefined && fielder.current !== -1) {
+        fieldingPositions[preset][fielder.current] = {x: x, y: y};
+
+        window.requestAnimationFrame(redraw);
+      } else {
+        if (findFielder(x, y) >= 0) {
+          canvas.current.style.cursor = "pointer";
+        } else {
+          canvas.current.style.cursor = "default";
+        }
+      }
+    });
+    canvas.current.addEventListener('touchmove', (e) => {
+      e.preventDefault();
+      let x = (e.targetTouches[0].pageX - canvas.current.offsetLeft) / scale.current;
+      let y = (e.targetTouches[0].pageY - canvas.current.offsetTop) / scale.current;
 
       if (clicked.current && fielder.current != undefined && fielder.current !== -1) {
         fieldingPositions[preset][fielder.current] = {x: x, y: y};
@@ -175,6 +202,7 @@ export default function Home() {
 
   const findFielder = (x, y) => {
     let offset = 25;
+    if (scale.current < 0.7) offset = 50;
     let chosen = -1;
 
     Object.values(fieldingPositions[preset]).some((f, i) => {
