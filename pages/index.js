@@ -13,43 +13,43 @@ import styles from '../styles/Home.module.sass';
 export default function Home() {
   let fieldingPositions = {
     "Default": {
-      "0": { x: 535, y: 390 }, // Wicketkeeper
-      "1": { x: 510, y: 380 }, // Slip
-      "2": { x: 520, y: 760 }, // Bowler
-      "3": { x: 420, y: 760 }, // Mid-off
-      "4": { x: 660, y: 760 }, // Mid-on
-      "5": { x: 320, y: 600 }, // Cover
-      "6": { x: 760, y: 600 }, // Mid-wicket
-      "7": { x: 320, y: 440 }, // Point
-      "8": { x: 760, y: 440 }, // Square leg
-      "9": { x: 310, y: 100 }, // 3rd man
-      "10": { x: 770, y: 100 }, // Fine leg
+      "0": { x: 510, y: 380 }, // Slip
+      "1": { x: 420, y: 760 }, // Mid-off
+      "2": { x: 660, y: 760 }, // Mid-on
+      "3": { x: 320, y: 600 }, // Cover
+      "4": { x: 760, y: 600 }, // Mid-wicket
+      "5": { x: 320, y: 440 }, // Point
+      "6": { x: 760, y: 440 }, // Square leg
+      "7": { x: 310, y: 100 }, // 3rd man
+      "8": { x: 770, y: 100 }, // Fine leg
+      // "0": { x: 535, y: 390 }, // Wicketkeeper
+      // "2": { x: 520, y: 760 }, // Bowler
     },
     "Leg Spinner": {
-      "0": { x: 535, y: 450 }, // Wicketkeeper
-      "1": { x: 515, y: 440 }, // Slip
-      "2": { x: 520, y: 630 }, // Bowler
-      "3": { x: 330, y: 980 }, // Long-off
-      "4": { x: 700, y: 980 }, // Long-on
-      "5": { x: 350, y: 640 }, // Extra cover
-      "6": { x: 760, y: 600 }, // Mid-wicket
-      "7": { x: 340, y: 420 }, // Point
-      "8": { x: 1000, y: 440 }, // Deep square
-      "9": { x: 70, y: 540 }, // Deep cover
-      "10": { x: 670, y: 340 }, // Short fine
+      "0": { x: 515, y: 440 }, // Slip
+      "1": { x: 330, y: 980 }, // Long-off
+      "2": { x: 700, y: 980 }, // Long-on
+      "3": { x: 350, y: 640 }, // Extra cover
+      "4": { x: 760, y: 600 }, // Mid-wicket
+      "5": { x: 340, y: 420 }, // Point
+      "6": { x: 1000, y: 440 }, // Deep square
+      "7": { x: 70, y: 540 }, // Deep cover
+      "8": { x: 670, y: 340 }, // Short fine
+      // "0": { x: 535, y: 450 }, // Wicketkeeper
+      // "2": { x: 520, y: 630 }, // Bowler
     },
     "Off Spinner": {
-      "0": { x: 520, y: 630 }, // Bowler
-      "1": { x: 535, y: 450 }, // Wicketkeeper
-      "2": { x: 980, y: 770 }, // Cow corner
-      "3": { x: 330, y: 980 }, // Long-off
-      "4": { x: 700, y: 980 }, // Long-on
-      "5": { x: 330, y: 520 }, // Cover
-      "6": { x: 350, y: 640 }, // Extra cover
-      "7": { x: 760, y: 600 }, // Mid-wicket
-      "8": { x: 360, y: 400 }, // Backward point
-      "9": { x: 1000, y: 440 }, // Deep square
-      "10": { x: 670, y: 340 }, // Short fine
+      "0": { x: 980, y: 770 }, // Cow corner
+      "1": { x: 330, y: 980 }, // Long-off
+      "2": { x: 700, y: 980 }, // Long-on
+      "3": { x: 330, y: 520 }, // Cover
+      "4": { x: 350, y: 640 }, // Extra cover
+      "5": { x: 760, y: 600 }, // Mid-wicket
+      "6": { x: 360, y: 400 }, // Backward point
+      "7": { x: 1000, y: 440 }, // Deep square
+      "8": { x: 670, y: 340 }, // Short fine
+      // "0": { x: 520, y: 630 }, // Bowler
+      // "1": { x: 535, y: 450 }, // Wicketkeeper
     }
   };
 
@@ -66,6 +66,7 @@ export default function Home() {
   let fielder = useRef(-1);
 
   let [preset, setPreset] = useState(Object.keys(fieldingPositions)[0]);
+  let [eventText, setEvent] = useState("");
 
   let pitchImg = useRef();
   let fielderImg = useRef();
@@ -104,12 +105,15 @@ export default function Home() {
   const redraw = () => {
     (() => {
       return new Promise((res, rej) => {
+        ctx.current.fillStyle = "#FFF";
+        ctx.current.fillRect(0, 0, 1080, 1080);
+
         drawPitch();
         res();
       })
     })().then(() => {
       drawFielders();
-      drawBatters();
+      // drawBatters();
     });
   }
 
@@ -120,7 +124,9 @@ export default function Home() {
     scale.current = container.current.offsetHeight / 1080.0;
 
     let promises = [];
-    promises.push(loadImage('./images/FieldingCircle.png'));
+    // promises.push(loadImage('./images/FieldingCircle.png'));
+    promises.push(loadImage('./images/FieldingCircleWKB.png'));
+    // promises.push(loadImage('./images/FieldingCircleLabelled.png'));
     promises.push(loadImage('./images/Fielder.png'));
     promises.push(loadImage('./images/Batter.png'));
 
@@ -136,9 +142,10 @@ export default function Home() {
     }).catch((err) => console.error(err));
 
     canvas.current.addEventListener('mousedown', (e) => {
+      console.log(x, y);
       clicked.current = true;
-      let x = e.layerX / scale.current;
-      let y = e.layerY / scale.current;
+      let x = (e.offsetX || e.layerX) / scale.current;
+      let y = (e.offsetY || e.layerY) / scale.current;
       fielder.current = findFielder(x, y);
     });
     canvas.current.addEventListener('touchstart', (e) => {
@@ -157,8 +164,8 @@ export default function Home() {
     });
 
     canvas.current.addEventListener('mousemove', (e) => {
-      let x = e.layerX / scale.current;
-      let y = e.layerY / scale.current;
+      let x = (e.offsetX || e.layerX) / scale.current;
+      let y = (e.offsetY || e.layerY) / scale.current;
 
       if (clicked.current && fielder.current != undefined && fielder.current !== -1) {
         fieldingPositions[preset][fielder.current] = {x: x, y: y};
